@@ -157,6 +157,11 @@ Solutions complémentaires :
 
 ---
 
+### Commande
+    - `openssl genrsa -out keypair.pem 2048`
+    - `openssl pkcs8 -topk8 -nocrypt -in keypair.pem -outform def -out private.key` 
+    - `openssl rsa -in keypair.pem -outfrom der -pubout -out public.key`
+
 ## 10. Conclusion
 
 À la fin de ce module :
