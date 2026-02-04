@@ -1,0 +1,157 @@
+### Open interactive terminal inside broker-1 Docker container
+docker exec -it broker-1 bash
+
+### Create and edit admin.properties file
+vi /kafka/config/admin.properties
+
+### admin.properties content
+security.protocol=SSL
+ssl.truststore.location=/kafka/security/broker-1.truststore.jks
+ssl.truststore.password=password
+ssl.keystore.location=/kafka/security/broker-1.keystore.jks
+ssl.keystore.password=password
+ssl.key.password=password
+
+### List ACLs
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --list \
+  --command-config /kafka/config/admin.properties
+
+### Producer ACLs
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:CN=consumer,OU=Community,O=Pluralsight,L=Utah,ST=Utah,C=US \
+  --operation CREATE \
+  --topic '*' \
+  --command-config /kafka/config/admin.properties
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:CN=producer,OU=Community,O=Pluralsight,L=Utah,ST=Utah,C=US \
+  --operation WRITE \
+  --topic 'auth-topic' \
+  --command-config /kafka/config/admin.properties
+
+### Consumer ACLs
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:CN=consumer,OU=Community,O=Pluralsight,L=Utah,ST=Utah,C=US \
+  --operation READ \
+  --topic 'auth-topic' \
+  --command-config /kafka/config/admin.properties
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:CN=consumer,OU=Community,O=Pluralsight,L=Utah,ST=Utah,C=US \
+  --operation All \
+  --group 'mtls.consumer' \
+  --command-config /kafka/config/admin.properties
+
+
+### Kafka Streams
+./kafka-configs.sh \
+    --zookeeper zookeeper-1:2181 \
+    --alter \
+    --add-config 'SCRAM-SHA-256=[iterations=8192,password=streams-secret]' \
+    --entity-type users \
+    --entity-name streams-app
+
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:streams-app \
+  --operation READ \
+  --topic 'auth-topic' \
+  --command-config /kafka/config/admin.properties
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:streams-app \
+  --operation All \
+  --group 'streams.app' \
+  --command-config /kafka/config/admin.properties
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:streams-app \
+  --operation ALL \
+  --topic 'streams.app-' \
+  --resource-pattern-type prefixed \
+  --command-config /kafka/config/admin.properties
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:streams-app \
+  --operation CREATE \
+  --topic 'final-topic' \
+  --command-config /kafka/config/admin.properties
+
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --allow-principal User:streams-app \
+  --operation WRITE \
+  --topic 'final-topic' \
+  --command-config /kafka/config/admin.properties
+
+
+### Kafka Connect
+### Open MySQL CLI
+docker exec -it mysql bash -c "mysql -uroot -ppassword"
+
+### MySQL commands
+USE pluralsight;
+
+SHOW TABLES;
+
+SELECT * FROM ratings;
+
+INSERT INTO ratings ( user_id, rating, comment ) VALUES
+( 1234, 5, "Excellent course!" );
+
+INSERT INTO ratings ( user_id, rating, comment ) VALUES
+( 5678, 1, "Disappointed!" );
+
+
+### Deploy Debezium Connector
+curl -i -X POST -H  "Content-Type:application/json" \
+    http://localhost:8083/connectors/ \
+    -d '{
+      "name": "debezium-connector",
+      "config": {
+        "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+        "tasks.max": "1",
+        "ssl.truststore.location": "/kafka/connect.truststore.jks",
+        "ssl.truststore.password": "password",
+        "sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"connect\" password=\"connect-secret\";",
+        "sasl.mechanism": "PLAIN",
+        "security.protocol": "SASL_SSL",
+        "database.hostname": "mysql",
+        "database.port": "3306",
+        "database.user": "admin",
+        "database.password": "admin",
+        "database.server.id": "123456",
+        "database.server.name": "mysql",
+        "database.include.list": "pluralsight",
+        "database.history":"io.debezium.relational.history.MemoryDatabaseHistory"
+      }
+    }'
+
+### Deny Kafka Connect ACL
+./kafka-acls.sh \
+  --bootstrap-server broker-1:9191 \
+  --add \
+  --deny-principal User:connect \
+  --operation WRITE \
+  --topic 'mysql.' \
+  --resource-pattern-type prefixed \
+  --command-config /kafka/config/admin.properties

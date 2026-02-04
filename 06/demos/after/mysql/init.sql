@@ -1,0 +1,12 @@
+GRANT SELECT, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT  ON *.* TO 'admin' IDENTIFIED BY 'admin';
+
+GRANT ALL PRIVILEGES ON pluralsight.* TO 'admin'@'%';
+
+USE pluralsight;
+
+CREATE  TABLE `ratings` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL ,
+  `rating` INT NOT NULL,
+  `comment` VARCHAR(255) )
+ENGINE = InnoDB;

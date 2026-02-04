@@ -1,0 +1,11 @@
+[mysqld]
+skip-host-cache
+skip-name-resolve
+
+user=mysql
+symbolic-links=0
+
+server-id=123456
+log_bin=mysql-bin
+expire-logs_days=1
+binlog_format=row

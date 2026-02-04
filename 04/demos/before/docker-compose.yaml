@@ -1,0 +1,297 @@
+---
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:7.4.1
+    hostname: zookeeper-1
+    container_name: zookeeper-1
+    volumes:
+      - ./security/keystore/zookeeper-1.keystore.jks:/security/zookeeper-1.keystore.jks
+      - ./security/truststore/zookeeper-1.truststore.jks:/security/zookeeper-1.truststore.jks
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_TICK_TIME: 2000
+
+      # Quorum
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
+
+      # TLS-only for clients: disable plaintext port, enable secure port
+      ZOOKEEPER_CLIENT_PORT: 0
+      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
+
+      # Use Netty (required for TLS client connections)
+      ZOOKEEPER_SERVER_CNXN_FACTORY: "org.apache.zookeeper.server.NettyServerCnxnFactory"
+
+      # Client TLS config (secureClientPort)
+      ZOOKEEPER_SSL_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: "/security/zookeeper-1.keystore.jks"
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: "/security/zookeeper-1.truststore.jks"
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: "password"
+
+      # Quorum TLS-only
+      ZOOKEEPER_SSL_QUORUM: "true"
+      ZOOKEEPER_PORT_UNIFICATION: "false"
+
+      ZOOKEEPER_SSL_QUORUM_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_LOCATION: "/security/zookeeper-1.keystore.jks"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_LOCATION: "/security/zookeeper-1.truststore.jks"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_PASSWORD: "password"
+
+
+  #          ZOO_CFG_EXTRA: "sslQuorum=true
+  #                          portUnification=false
+  #                          serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
+  #
+  #                          ssl.quorum.hostnameVerification=false
+  #                          ssl.quorum.keyStore.location=/security/zookeeper-1.keystore.jks
+  #                          ssl.quorum.keyStore.password=password
+  #                          ssl.quorum.trustStore.location=/security/zookeeper-1.truststore.jks
+  #                          ssl.quorum.trustStore.password=password
+  #
+  #                          secureClientPort=2281
+  #                          ssl.hostnameVerification=false
+  #                          ssl.keyStore.location=/security/zookeeper-1.keystore.jks
+  #                          ssl.keyStore.password=password
+  #                          ssl.trustStore.location=/security/zookeeper-1.truststore.jks
+  #                          ssl.trustStore.password=password"
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:7.4.1
+    hostname: zookeeper-2
+    container_name: zookeeper-2
+    volumes:
+      - ./security/keystore/zookeeper-2.keystore.jks:/security/zookeeper-2.keystore.jks
+      - ./security/truststore/zookeeper-2.truststore.jks:/security/zookeeper-2.truststore.jks
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_TICK_TIME: 2000
+
+      # Quorum
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
+
+      # TLS-only for clients: disable plaintext port, enable secure port
+      ZOOKEEPER_CLIENT_PORT: 0
+      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
+
+      # Use Netty (required for TLS client connections)
+      ZOOKEEPER_SERVER_CNXN_FACTORY: "org.apache.zookeeper.server.NettyServerCnxnFactory"
+
+      # Client TLS config (secureClientPort)
+      ZOOKEEPER_SSL_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: "/security/zookeeper-2.keystore.jks"
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: "/security/zookeeper-2.truststore.jks"
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: "password"
+
+      # Quorum TLS-only
+      ZOOKEEPER_SSL_QUORUM: "true"
+      ZOOKEEPER_PORT_UNIFICATION: "false"
+
+      ZOOKEEPER_SSL_QUORUM_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_LOCATION: "/security/zookeeper-2.keystore.jks"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_LOCATION: "/security/zookeeper-2.truststore.jks"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_PASSWORD: "password"
+
+  #          ZOO_CFG_EXTRA: "sslQuorum=true
+  #                          portUnification=false
+  #                          serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
+  #
+  #                          ssl.quorum.hostnameVerification=false
+  #                          ssl.quorum.keyStore.location=/security/zookeeper-2.keystore.jks
+  #                          ssl.quorum.keyStore.password=password
+  #                          ssl.quorum.trustStore.location=/security/zookeeper-2.truststore.jks
+  #                          ssl.quorum.trustStore.password=password
+  #
+  #                          secureClientPort=2281
+  #                          ssl.hostnameVerification=false
+  #                          ssl.keyStore.location=/security/zookeeper-2.keystore.jks
+  #                          ssl.keyStore.password=password
+  #                          ssl.trustStore.location=/security/zookeeper-2.truststore.jks
+  #                          ssl.trustStore.password=password"
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:7.4.1
+    hostname: zookeeper-3
+    container_name: zookeeper-3
+    volumes:
+      - ./security/keystore/zookeeper-3.keystore.jks:/security/zookeeper-3.keystore.jks
+      - ./security/truststore/zookeeper-3.truststore.jks:/security/zookeeper-3.truststore.jks
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_TICK_TIME: 2000
+
+      # Quorum
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
+
+      # TLS-only for clients: disable plaintext port, enable secure port
+      ZOOKEEPER_CLIENT_PORT: 0
+      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
+
+      # Use Netty (required for TLS client connections)
+      ZOOKEEPER_SERVER_CNXN_FACTORY: "org.apache.zookeeper.server.NettyServerCnxnFactory"
+
+      # Client TLS config (secureClientPort)
+      ZOOKEEPER_SSL_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: "/security/zookeeper-3.keystore.jks"
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: "/security/zookeeper-3.truststore.jks"
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: "password"
+
+      # Quorum TLS-only
+      ZOOKEEPER_SSL_QUORUM: "true"
+      ZOOKEEPER_PORT_UNIFICATION: "false"
+
+      ZOOKEEPER_SSL_QUORUM_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_LOCATION: "/security/zookeeper-3.keystore.jks"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_LOCATION: "/security/zookeeper-3.truststore.jks"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_PASSWORD: "password"
+
+  #          ZOO_CFG_EXTRA: "sslQuorum=true
+  #                          portUnification=false
+  #                          serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
+  #
+  #                          ssl.quorum.hostnameVerification=false
+  #                          ssl.quorum.keyStore.location=/security/zookeeper-3.keystore.jks
+  #                          ssl.quorum.keyStore.password=password
+  #                          ssl.quorum.trustStore.location=/security/zookeeper-3.truststore.jks
+  #                          ssl.quorum.trustStore.password=password
+  #
+  #                          secureClientPort=2281
+  #                          ssl.hostnameVerification=false
+  #                          ssl.keyStore.location=/security/zookeeper-3.keystore.jks
+  #                          ssl.keyStore.password=password
+  #                          ssl.trustStore.location=/security/zookeeper-3.truststore.jks
+  #                          ssl.trustStore.password=password"
+
+  broker-1:
+    image: confluentinc/cp-kafka:7.4.1
+    hostname: broker-1
+    container_name: broker-1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "9091:9091"
+      - "29091:29091"
+    volumes:
+      - ./security/keystore/broker-1.keystore.jks:/kafka/security/broker-1.keystore.jks
+      - ./security/truststore/broker-1.truststore.jks:/kafka/security/broker-1.truststore.jks
+    environment:
+      KAFKA_BROKER_ID: 1
+      # ZK over TLS: use secureClientPort
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
+      KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
+      KAFKA_ZOOKEEPER_SASL_CLIENT_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /kafka/security/broker-1.keystore.jks
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-1.truststore.jks
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka listeners (PLAINTEXT as in your config)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: HOST:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9091,INTERNAL://broker-1:29091
+      KAFKA_LISTENERS: HOST://0.0.0.0:9091,INTERNAL://0.0.0.0:29091
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+
+  broker-2:
+    image: confluentinc/cp-kafka:7.4.1
+    hostname: broker-2
+    container_name: broker-2
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    volumes:
+      - ./security/keystore/broker-2.keystore.jks:/kafka/security/broker-2.keystore.jks
+      - ./security/truststore/broker-2.truststore.jks:/kafka/security/broker-2.truststore.jks
+    environment:
+      KAFKA_BROKER_ID: 2
+      # ZK over TLS: use secureClientPort
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
+      KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
+      KAFKA_ZOOKEEPER_SASL_CLIENT_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /kafka/security/broker-2.keystore.jks
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-2.truststore.jks
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka listeners (PLAINTEXT as in your config)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: HOST:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9092,INTERNAL://broker-2:29092
+      KAFKA_LISTENERS: HOST://0.0.0.0:9092,INTERNAL://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+
+  broker-3:
+    image: confluentinc/cp-kafka:7.4.1
+    hostname: broker-3
+    container_name: broker-3
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "9093:9093"
+      - "29093:29093"
+    volumes:
+      - ./security/keystore/broker-3.keystore.jks:/kafka/security/broker-3.keystore.jks
+      - ./security/truststore/broker-3.truststore.jks:/kafka/security/broker-3.truststore.jks
+    environment:
+      KAFKA_BROKER_ID: 3
+      # ZK over TLS: use secureClientPort
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
+      KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
+      KAFKA_ZOOKEEPER_SASL_CLIENT_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /kafka/security/broker-3.keystore.jks
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-3.truststore.jks
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka listeners (PLAINTEXT as in your config)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: HOST:PLAINTEXT,INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: HOST://localhost:9093,INTERNAL://broker-3:29093
+      KAFKA_LISTENERS: HOST://0.0.0.0:9093,INTERNAL://0.0.0.0:29093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:7.4.1
+    ports:
+      - "8082:8082"
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - broker-1
+      - broker-2
+      - broker-3
+    hostname: rest-proxy
+    container_name: rest-proxy
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: 'broker-1:29091,broker-2:29092,broker-3:29093'
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"

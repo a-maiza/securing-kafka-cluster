@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/02/demos/after/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/02/demos/before/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/03/demos/before/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/03/demos/after/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/04/demos/before/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/04/demos/after/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/05/demos/before/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/05/demos/after/clients/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" default="true" project-jdk-name="corretto-21" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
