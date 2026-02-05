@@ -21,7 +21,7 @@ public class SASLPlainConsumer {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker-1:9291,broker-2:9292,broker-3:9293");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker-1:29191,broker-2:29192,broker-3:29193");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "sasl.plain.consumer");
@@ -29,7 +29,7 @@ public class SASLPlainConsumer {
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
         props.put(SaslConfigs.SASL_MECHANISM, "PLAIN");
 
-        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "/Users/bogdan/pluralsight/securing-kafka-cluster/m5/security/truststore/consumer.truststore.jks"); // Replace with the absolute path on your machine
+        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "/Users/abdeldjalilmaiza/IdeaProjects/securing-kafka-cluster/05/demos/after/security/truststore/consumer.truststore.jks"); // Replace with the absolute path on your machine
         props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "password");
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);

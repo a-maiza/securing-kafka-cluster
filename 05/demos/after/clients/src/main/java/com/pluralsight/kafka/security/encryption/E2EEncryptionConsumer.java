@@ -20,7 +20,7 @@ public class E2EEncryptionConsumer {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker-1:9191,broker-2:9192,broker-3:9193");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker-1:29091,broker-2:29092,broker-3:29093");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "e2e.consumer");
 
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -30,11 +30,11 @@ public class E2EEncryptionConsumer {
 
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
 
-        props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "/Users/bogdan/pluralsight/securing-kafka-cluster/m4/security/keystore/consumer.keystore.jks"); // Replace with the absolute path on your machine
+        props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, "/Users/abdeldjalilmaiza/IdeaProjects/securing-kafka-cluster/05/demos/after/security/keystore/consumer.keystore.jks"); // Replace with the absolute path on your machine
         props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, "password");
         props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, "password");
 
-        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "/Users/bogdan/pluralsight/securing-kafka-cluster/m4/security/truststore/consumer.truststore.jks"); // Replace with the absolute path on your machine
+        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "/Users/abdeldjalilmaiza/IdeaProjects/securing-kafka-cluster/05/demos/after/security/truststore/consumer.truststore.jks"); // Replace with the absolute path on your machine
         props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "password");
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);

@@ -1,199 +1,304 @@
 ---
-    services:
-      zookeeper-1:
-        image: confluentinc/cp-zookeeper:7.4.1
-        hostname: zookeeper-1
-        container_name: zookeeper-1
-        volumes:
-            - ./security/keystore/zookeeper-1.keystore.jks:/security/zookeeper-1.keystore.jks
-            - ./security/truststore/zookeeper-1.truststore.jks:/security/zookeeper-1.truststore.jks
-        environment:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-          ZOO_MY_ID: 1
-          ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
-          ZOO_CFG_EXTRA: "sslQuorum=true 
-                          portUnification=false 
-                          serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
-                          
-                          ssl.quorum.hostnameVerification=false
-                          ssl.quorum.keyStore.location=/security/zookeeper-1.keystore.jks
-                          ssl.quorum.keyStore.password=password
-                          ssl.quorum.trustStore.location=/security/zookeeper-1.truststore.jks
-                          ssl.quorum.trustStore.password=password
-                          
-                          secureClientPort=2281
-                          ssl.hostnameVerification=false
-                          ssl.keyStore.location=/security/zookeeper-1.keystore.jks
-                          ssl.keyStore.password=password
-                          ssl.trustStore.location=/security/zookeeper-1.truststore.jks
-                          ssl.trustStore.password=password"
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:7.4.1
+    hostname: zookeeper-1
+    container_name: zookeeper-1
+    volumes:
+      - ./security/keystore/zookeeper-1.keystore.jks:/security/zookeeper-1.keystore.jks
+      - ./security/truststore/zookeeper-1.truststore.jks:/security/zookeeper-1.truststore.jks
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_TICK_TIME: 2000
 
-      zookeeper-2:
-        image: confluentinc/cp-zookeeper:7.4.1
-        hostname: zookeeper-2
-        container_name: zookeeper-2
-        volumes:
-            - ./security/keystore/zookeeper-2.keystore.jks:/security/zookeeper-2.keystore.jks
-            - ./security/truststore/zookeeper-2.truststore.jks:/security/zookeeper-2.truststore.jks
-        environment:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-          ZOO_MY_ID: 2
-          ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
-          ZOO_CFG_EXTRA: "sslQuorum=true 
-                          portUnification=false 
-                          serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
+      # Quorum
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
 
-                          ssl.quorum.hostnameVerification=false
-                          ssl.quorum.keyStore.location=/security/zookeeper-2.keystore.jks
-                          ssl.quorum.keyStore.password=password
-                          ssl.quorum.trustStore.location=/security/zookeeper-2.truststore.jks
-                          ssl.quorum.trustStore.password=password
-                          
-                          secureClientPort=2281
-                          ssl.hostnameVerification=false
-                          ssl.keyStore.location=/security/zookeeper-2.keystore.jks
-                          ssl.keyStore.password=password
-                          ssl.trustStore.location=/security/zookeeper-2.truststore.jks
-                          ssl.trustStore.password=password"
-      
-      zookeeper-3:
-        image: confluentinc/cp-zookeeper:7.4.1
-        hostname: zookeeper-3
-        container_name: zookeeper-3
-        volumes:
-            - ./security/keystore/zookeeper-3.keystore.jks:/security/zookeeper-3.keystore.jks
-            - ./security/truststore/zookeeper-3.truststore.jks:/security/zookeeper-3.truststore.jks
-        environment:
-          ZOOKEEPER_CLIENT_PORT: 2181
-          ZOOKEEPER_TICK_TIME: 2000
-          ZOO_MY_ID: 3
-          ZOO_SERVERS: server.1=zookeeper-1:2888:3888;2181 server.2=zookeeper-2:2888:3888;2181 server.3=zookeeper-3:2888:3888;2181
-          ZOO_CFG_EXTRA: "sslQuorum=true 
-                          portUnification=false 
-                          serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
+      # TLS-only for clients: disable plaintext port, enable secure port
+      ZOOKEEPER_CLIENT_PORT: 0
+      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
 
-                          ssl.quorum.hostnameVerification=false
-                          ssl.quorum.keyStore.location=/security/zookeeper-3.keystore.jks
-                          ssl.quorum.keyStore.password=password
-                          ssl.quorum.trustStore.location=/security/zookeeper-3.truststore.jks
-                          ssl.quorum.trustStore.password=password
-                          
-                          secureClientPort=2281
-                          ssl.hostnameVerification=false
-                          ssl.keyStore.location=/security/zookeeper-3.keystore.jks
-                          ssl.keyStore.password=password
-                          ssl.trustStore.location=/security/zookeeper-3.truststore.jks
-                          ssl.trustStore.password=password"
+      # Use Netty (required for TLS client connections)
+      ZOOKEEPER_SERVER_CNXN_FACTORY: "org.apache.zookeeper.server.NettyServerCnxnFactory"
 
-      broker-1:
-        image: confluentinc/cp-kafka:7.4.1
-        hostname: broker-1
-        container_name: broker-1
-        depends_on:
-          - zookeeper-1
-          - zookeeper-2
-          - zookeeper-3
-        ports:
-          - "9091:9091"   
-          - "9191:9191"
-        volumes:
-            - ./security/keystore/broker-1.keystore.jks:/kafka/security/broker-1.keystore.jks
-            - ./security/truststore/broker-1.truststore.jks:/kafka/security/broker-1.truststore.jks
-        environment:
-          KAFKA_BROKER_ID: 1
-          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SSL:SSL
-          KAFKA_ADVERTISED_LISTENERS: SSL://broker-1:9191
-          KAFKA_LISTENERS: SSL://broker-1:9191·
-          KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-          KAFKA_MIN_INSYNC_REPLICAS: 2
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-          KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
-          KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
-          KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /kafka/security/broker-1.keystore.jks 
-          KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
-          KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-1.truststore.jks
-          KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
-          KAFKA_SSL_CLIENT_AUTH: none
-          KAFKA_SSL_KEYSTORE_LOCATION: /kafka/security/broker-1.keystore.jks 
-          KAFKA_SSL_KEYSTORE_PASSWORD: password
-          KAFKA_SSL_KEY_PASSWORD: password
-          KAFKA_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-1.truststore.jks
-          KAFKA_SSL_TRUSTSTORE_PASSWORD: password
-          KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
-    
-      broker-2:
-        image: confluentinc/cp-kafka:7.4.1
-        hostname: broker-2
-        container_name: broker-2
-        depends_on:
-          - zookeeper-1
-          - zookeeper-2
-          - zookeeper-3
-        ports:
-          - "9092:9092"  
-          - "9192:9192"
-        volumes:
-            - ./security/keystore/broker-2.keystore.jks:/kafka/security/broker-2.keystore.jks
-            - ./security/truststore/broker-2.truststore.jks:/kafka/security/broker-2.truststore.jks  
-        environment:
-          KAFKA_BROKER_ID: 2
-          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SSL:SSL
-          KAFKA_ADVERTISED_LISTENERS: SSL://broker-2:9192
-          KAFKA_LISTENERS: SSL://broker-2:9192
-          KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-          KAFKA_MIN_INSYNC_REPLICAS: 2
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-          KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
-          KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
-          KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /kafka/security/broker-2.keystore.jks 
-          KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
-          KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-2.truststore.jks
-          KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
-          KAFKA_SSL_CLIENT_AUTH: none
-          KAFKA_SSL_KEYSTORE_LOCATION: /kafka/security/broker-2.keystore.jks 
-          KAFKA_SSL_KEYSTORE_PASSWORD: password
-          KAFKA_SSL_KEY_PASSWORD: password
-          KAFKA_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-2.truststore.jks
-          KAFKA_SSL_TRUSTSTORE_PASSWORD: password
-          KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
-    
-      broker-3:
-        image: confluentinc/cp-kafka:7.4.1
-        hostname: broker-3
-        container_name: broker-3
-        depends_on:
-          - zookeeper-1
-          - zookeeper-2
-          - zookeeper-3
-        ports:
-          - "9093:9093"
-          - "9193:9193"
-        volumes:
-            - ./security/keystore/broker-3.keystore.jks:/kafka/security/broker-3.keystore.jks
-            - ./security/truststore/broker-3.truststore.jks:/kafka/security/broker-3.truststore.jks  
-        environment:
-          KAFKA_BROKER_ID: 3
-          KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
-          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SSL:SSL
-          KAFKA_ADVERTISED_LISTENERS: SSL://broker-3:9193
-          KAFKA_LISTENERS: SSL://broker-3:9193
-          KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-          KAFKA_MIN_INSYNC_REPLICAS: 2
-          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
-          KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
-          KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
-          KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /kafka/security/broker-3.keystore.jks 
-          KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
-          KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-3.truststore.jks
-          KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
-          KAFKA_SSL_CLIENT_AUTH: none
-          KAFKA_SSL_KEYSTORE_LOCATION: /kafka/security/broker-3.keystore.jks 
-          KAFKA_SSL_KEYSTORE_PASSWORD: password
-          KAFKA_SSL_KEY_PASSWORD: password
-          KAFKA_SSL_TRUSTSTORE_LOCATION: /kafka/security/broker-3.truststore.jks
-          KAFKA_SSL_TRUSTSTORE_PASSWORD: password
-          KAFKA_SECURITY_INTER_BROKER_PROTOCOL: SSL
+      # Client TLS config (secureClientPort)
+      ZOOKEEPER_SSL_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: "/security/zookeeper-1.keystore.jks"
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: "/security/zookeeper-1.truststore.jks"
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: "password"
+
+      # Quorum TLS-only
+      ZOOKEEPER_SSL_QUORUM: "true"
+      ZOOKEEPER_PORT_UNIFICATION: "false"
+
+      ZOOKEEPER_SSL_QUORUM_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_LOCATION: "/security/zookeeper-1.keystore.jks"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_LOCATION: "/security/zookeeper-1.truststore.jks"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_PASSWORD: "password"
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:7.4.1
+    hostname: zookeeper-2
+    container_name: zookeeper-2
+    volumes:
+      - ./security/keystore/zookeeper-2.keystore.jks:/security/zookeeper-2.keystore.jks
+      - ./security/truststore/zookeeper-2.truststore.jks:/security/zookeeper-2.truststore.jks
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_TICK_TIME: 2000
+
+      # Quorum
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
+
+      # TLS-only for clients: disable plaintext port, enable secure port
+      ZOOKEEPER_CLIENT_PORT: 0
+      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
+
+      # Use Netty (required for TLS client connections)
+      ZOOKEEPER_SERVER_CNXN_FACTORY: "org.apache.zookeeper.server.NettyServerCnxnFactory"
+
+      # Client TLS config (secureClientPort)
+      ZOOKEEPER_SSL_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: "/security/zookeeper-2.keystore.jks"
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: "/security/zookeeper-2.truststore.jks"
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: "password"
+
+      # Quorum TLS-only
+      ZOOKEEPER_SSL_QUORUM: "true"
+      ZOOKEEPER_PORT_UNIFICATION: "false"
+
+      ZOOKEEPER_SSL_QUORUM_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_LOCATION: "/security/zookeeper-2.keystore.jks"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_LOCATION: "/security/zookeeper-2.truststore.jks"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_PASSWORD: "password"
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:7.4.1
+    hostname: zookeeper-3
+    container_name: zookeeper-3
+    volumes:
+      - ./security/keystore/zookeeper-3.keystore.jks:/security/zookeeper-3.keystore.jks
+      - ./security/truststore/zookeeper-3.truststore.jks:/security/zookeeper-3.truststore.jks
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_TICK_TIME: 2000
+
+      # Quorum
+      ZOOKEEPER_SERVERS: "zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888"
+
+      # TLS-only for clients: disable plaintext port, enable secure port
+      ZOOKEEPER_CLIENT_PORT: 0
+      ZOOKEEPER_SECURE_CLIENT_PORT: 2281
+
+      # Use Netty (required for TLS client connections)
+      ZOOKEEPER_SERVER_CNXN_FACTORY: "org.apache.zookeeper.server.NettyServerCnxnFactory"
+
+      # Client TLS config (secureClientPort)
+      ZOOKEEPER_SSL_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: "/security/zookeeper-3.keystore.jks"
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: "/security/zookeeper-3.truststore.jks"
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: "password"
+
+      # Quorum TLS-only
+      ZOOKEEPER_SSL_QUORUM: "true"
+      ZOOKEEPER_PORT_UNIFICATION: "false"
+
+      ZOOKEEPER_SSL_QUORUM_HOSTNAME_VERIFICATION: "false"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_LOCATION: "/security/zookeeper-3.keystore.jks"
+      ZOOKEEPER_SSL_QUORUM_KEYSTORE_PASSWORD: "password"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_LOCATION: "/security/zookeeper-3.truststore.jks"
+      ZOOKEEPER_SSL_QUORUM_TRUSTSTORE_PASSWORD: "password"
+
+  broker-1:
+    image: confluentinc/cp-kafka:7.4.1
+    hostname: broker-1
+    container_name: broker-1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "9091:9091"
+      - "29091:29091"
+    volumes:
+      - ./security/keystore/broker-1.keystore.jks:/etc/kafka/secrets/broker-1.keystore.jks
+      - ./security/truststore/broker-1.truststore.jks:/etc/kafka/secrets/broker-1.truststore.jks
+      - ./security/creds/broker_keystore_creds:/etc/kafka/secrets/keystore_creds
+      - ./security/creds/broker_key_creds:/etc/kafka/secrets/key_creds
+      - ./security/creds/broker_truststore_creds:/etc/kafka/secrets/truststore_creds
+    environment:
+      KAFKA_BROKER_ID: 1
+      # ZK over TLS: use secureClientPort (ZooKeeper SSL)
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
+      KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
+      KAFKA_ZOOKEEPER_SASL_CLIENT_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/broker-1.keystore.jks
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/broker-1.truststore.jks
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka listeners
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:SSL
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9091,INTERNAL://broker-1:29091
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9091,INTERNAL://0.0.0.0:29091
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      KAFKA_SSL_CLIENT_AUTH: none
+      # SSL (listener scoped)
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/broker-1.keystore.jks
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEY_PASSWORD: password
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/broker-1.truststore.jks
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Obligatoire pour satisfaire l’entrypoint Confluent
+      KAFKA_SSL_KEYSTORE_FILENAME: broker-1.keystore.jks
+      KAFKA_SSL_TRUSTSTORE_FILENAME: broker-1.truststore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: key_creds
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: truststore_creds
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+
+  broker-2:
+    image: confluentinc/cp-kafka:7.4.1
+    hostname: broker-2
+    container_name: broker-2
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    volumes:
+      - ./security/keystore/broker-2.keystore.jks:/etc/kafka/secrets/broker-2.keystore.jks
+      - ./security/truststore/broker-2.truststore.jks:/etc/kafka/secrets/broker-2.truststore.jks
+      - ./security/creds/broker_keystore_creds:/etc/kafka/secrets/keystore_creds
+      - ./security/creds/broker_key_creds:/etc/kafka/secrets/key_creds
+      - ./security/creds/broker_truststore_creds:/etc/kafka/secrets/truststore_creds
+    environment:
+      KAFKA_BROKER_ID: 2
+      # ZK over TLS: use secureClientPort
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
+      KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
+      KAFKA_ZOOKEEPER_SASL_CLIENT_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/broker-2.keystore.jks
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/broker-2.truststore.jks
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka listeners
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:SSL
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092,INTERNAL://broker-2:29092
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092,INTERNAL://0.0.0.0:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      KAFKA_SSL_CLIENT_AUTH: none
+      # SSL (listener scoped)
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/broker-2.keystore.jks
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEY_PASSWORD: password
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/broker-2.truststore.jks
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Obligatoire pour satisfaire l’entrypoint Confluent
+      KAFKA_SSL_KEYSTORE_FILENAME: broker-2.keystore.jks
+      KAFKA_SSL_TRUSTSTORE_FILENAME: broker-2.truststore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: key_creds
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: truststore_creds
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+
+  broker-3:
+    image: confluentinc/cp-kafka:7.4.1
+    hostname: broker-3
+    container_name: broker-3
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "9093:9093"
+      - "29093:29093"
+
+    volumes:
+      - ./security/keystore/broker-3.keystore.jks:/etc/kafka/secrets/broker-3.keystore.jks
+      - ./security/truststore/broker-3.truststore.jks:/etc/kafka/secrets/broker-3.truststore.jks
+      - ./security/creds/broker_keystore_creds:/etc/kafka/secrets/keystore_creds
+      - ./security/creds/broker_key_creds:/etc/kafka/secrets/key_creds
+      - ./security/creds/broker_truststore_creds:/etc/kafka/secrets/truststore_creds
+    environment:
+      KAFKA_BROKER_ID: 3
+      # ZK over TLS: use secureClientPort
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2281,zookeeper-2:2281,zookeeper-3:2281
+      KAFKA_ZOOKEEPER_SSL_CLIENT_ENABLE: "true"
+      KAFKA_ZOOKEEPER_SASL_CLIENT_ENABLE: "false"
+      KAFKA_ZOOKEEPER_CLIENT_CNXN_SOCKET: org.apache.zookeeper.ClientCnxnSocketNetty
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/broker-3.keystore.jks
+      KAFKA_ZOOKEEPER_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/broker-3.truststore.jks
+      KAFKA_ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka listeners
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:SSL
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9093,INTERNAL://broker-3:29093
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9093,INTERNAL://0.0.0.0:29093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      KAFKA_SSL_CLIENT_AUTH: none
+      # SSL (listener scoped)
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/broker-3.keystore.jks
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_KEY_PASSWORD: password
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/broker-3.truststore.jks
+      KAFKA_LISTENER_NAME_INTERNAL_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Obligatoire pour satisfaire l’entrypoint Confluent
+      KAFKA_SSL_KEYSTORE_FILENAME: broker-3.keystore.jks
+      KAFKA_SSL_TRUSTSTORE_FILENAME: broker-3.truststore.jks
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: keystore_creds
+      KAFKA_SSL_KEY_CREDENTIALS: key_creds
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: truststore_creds
+
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:7.4.1
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./security/truststore/rest-proxy.truststore.jks:/etc/kafka/secrets/rest-proxy.truststore.jks
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+      - broker-1
+      - broker-2
+      - broker-3
+    hostname: rest-proxy
+    container_name: rest-proxy
+    environment:
+      KAFKA_REST_HOST_NAME: rest-proxy
+      KAFKA_REST_BOOTSTRAP_SERVERS: 'broker-1:29091,broker-2:29092,broker-3:29093'
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+      KAFKA_REST_CLIENT_SECURITY_PROTOCOL: SSL
+      KAFKA_REST_CLIENT_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/rest-proxy.truststore.jks
+      KAFKA_REST_CLIENT_SSL_TRUSTSTORE_PASSWORD: password
