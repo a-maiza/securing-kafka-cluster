@@ -18,14 +18,14 @@ public class SASLOAuthProducer {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker-1:9291,broker-2:9292,broker-3:9293");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "broker-1:29191,broker-2:29192,broker-3:29193");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
         props.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
 
-        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "/Users/bogdan/pluralsight/securing-kafka-cluster/m5/security/truststore/producer.truststore.jks"); // Replace with the absolute path on your machine
+        props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, "/Users/abdeldjalilmaiza/IdeaProjects/securing-kafka-cluster/05/demos/after/security/truststore/producer.truststore.jks"); // Replace with the absolute path on your machine
         props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "password");
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(props);

@@ -178,3 +178,107 @@ Kafka permet d’aller plus loin :
 
 ## Conclusion
 SASL PLAIN est un mécanisme d’authentification Kafka **facile à configurer**, mais **intrinsèquement sensible**. Il doit toujours être combiné avec **TLS** et idéalement renforcé par une gestion externe des identifiants pour un usage sécurisé en production.
+
+# SASL SCRAM avec Kafka
+
+## Objectif
+Ce module présente **SASL SCRAM** comme un mécanisme d’authentification Kafka plus sécurisé que **SASL PLAIN**, reposant sur des échanges cryptographiques plutôt que sur la transmission directe des mots de passe.
+
+## Qu’est-ce que SASL SCRAM ?
+**SCRAM** signifie *Salted Challenge Response Authentication Mechanism*.
+
+Principes clés :
+- Le **client ne transmet jamais son mot de passe en clair**
+- Le serveur envoie un **challenge**
+- Le client ne peut répondre correctement **que s’il possède le bon mot de passe**
+- Les mots de passe sont :
+  - **hachés**
+  - **salés**
+  - stockés de manière sécurisée
+
+## Algorithmes de hachage
+Kafka supporte deux variantes SCRAM basées sur SHA-2 :
+- **SCRAM-SHA-256**
+- **SCRAM-SHA-512**
+
+Les deux sont considérées comme **sécurisées** à ce jour.  
+➡️ Le choix est libre, mais **doit être cohérent sur tous les brokers**.
+
+## Configuration JAAS
+Comme pour les autres mécanismes SASL, SCRAM utilise **JAAS**.
+
+### Entrées obligatoires
+- **KafkaServer** pour les brokers
+- **KafkaClient** pour les producteurs, consommateurs et outils admin
+
+### Module d’authentification
+Pour SCRAM, on utilise :
+
+
+Contrairement à SASL PLAIN :
+- Les **listes complètes d’identifiants ne sont pas stockées dans les fichiers JAAS**
+- Elles sont stockées dans **ZooKeeper**
+
+Les fichiers JAAS contiennent uniquement :
+- Le nom d’utilisateur
+- Le mot de passe du client ou du broker
+
+## Stockage des identifiants
+- Les identifiants SCRAM sont stockés dans **ZooKeeper**
+- Cela implique :
+  - ZooKeeper devient un **élément critique de sécurité**
+  - Il doit impérativement être **sécurisé**
+
+## Considérations de sécurité
+Lors de l’utilisation de SASL SCRAM, il est essentiel de respecter ces règles :
+
+1. **Sécuriser ZooKeeper**
+  - Les identifiants y sont stockés
+  - Une compromission expose l’authentification Kafka
+
+2. **Toujours utiliser TLS en production**
+  - Utiliser **SASL_SSL**
+  - Protège contre :
+    - Attaques par dictionnaire
+    - Attaques par force brute
+
+3. **Utiliser des mots de passe forts**
+  - Réduit l’impact d’une fuite éventuelle
+  - Renforce la résistance aux attaques hors ligne
+
+4. **Callback handlers personnalisés**
+  - Possibilité de :
+    - Ne pas stocker les identifiants dans ZooKeeper
+    - Utiliser un coffre-fort ou un service externe
+    - Déléguer complètement l’authentification
+
+## Mise en place pratique (résumé)
+### Étapes principales
+1. Créer les fichiers JAAS SCRAM pour brokers et clients
+2. Configurer Kafka avec :
+  - `SCRAM-SHA-256` ou `SCRAM-SHA-512`
+  - `SASL_MECHANISM_INTER_BROKER_PROTOCOL`
+3. Démarrer ZooKeeper
+4. Créer les identifiants via les scripts Kafka (`kafka-configs`)
+5. Déployer les brokers
+6. Configurer producteurs et consommateurs avec :
+  - SASL SCRAM
+  - JAAS
+  - Option JVM `-Djava.security.auth.login.config`
+7. Démarrer les clients et valider les échanges
+
+## Points d’attention
+- Les brokers sont **à la fois clients et serveurs**
+- Chaque broker doit avoir ses propres identifiants SCRAM
+- Chaque client (producer, consumer) doit avoir :
+  - Un utilisateur distinct
+  - Des identifiants stockés dans ZooKeeper
+
+## Avantages de SASL SCRAM
+- Plus sécurisé que SASL PLAIN
+- Pas de mot de passe transmis sur le réseau
+- Compatible avec TLS
+- Configuration cohérente avec les autres mécanismes SASL
+
+## Conclusion
+**SASL SCRAM** est un excellent compromis entre **sécurité**, **simplicité** et **robustesse**. Associé à **TLS** et à un ZooKeeper sécurisé, il constitue une solution solide pour l’authentification Kafka en production, tout en restant plus simple à gérer que mTLS.
