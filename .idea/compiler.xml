@@ -10,10 +10,10 @@
         <module name="security" />
         <module name="security zookeeper broker befor" />
         <module name="security (1)" />
+        <module name="authenticating client after" />
         <module name="security zookeeper broker after" />
-        <module name="security (2)" />
+        <module name="authenticating client befor" />
         <module name="security befor" />
-        <module name="security (3)" />
       </profile>
     </annotationProcessing>
   </component>
